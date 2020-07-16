@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    body {
+        width: 1600px;
+        margin: 0 auto;
+        margin-top: 2em;
+    }
+
+    svg {
+        font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+</style>
+<body>
+<script src="d3.js"></script>
+<script src="topojson.v1.min.js"></script>
+<script>
+    /**
+     * copied from the following resources:
+     * http://bl.ocks.org/micahstubbs/281d7b7a7e39a9b59cf80f1b8bd41a72
+     * http://bl.ocks.org/msbarry/9911363
+     * http://bl.ocks.org/weiglemc/6185069
+     *
+    **/
+
+	const margin = {top: 0, right: 0, bottom: 0, left: 0};
+	const width = 1600 - margin.left - margin.right;
+	const height = 550 - margin.top - margin.bottom;
+	const scatterShiftx = 900;
+	const scatterShifty = 10;
+
+    const color = d3.scaleThreshold()
+        .domain([2, 3, 4, 5, 6, 7, 8])
+        .range( d3.schemeBlues[7] )
+        .unknown(d3.rgb(255,200,200));
+
+    const greyColor = d3.scaleThreshold()
+        .domain([2, 3, 4, 5, 6, 7, 8])
+        .range( d3.schemeGreys[7] )
+        .unknown(d3.rgb(255,200,200));
+
+    const svg = d3.select('body')
+			.append('svg')
+			.attr('width', width)
+			.attr('height', height);
+
+    const map = svg
+        .append('g')
+        .attr('class', 'map');
+
+    const scatterplot = svg
+        .append('g')
+        .attr('class', 'scatterplot')
+        .attr("transform", "translate(" + scatterShiftx+ ", " + scatterShifty + ")");
+
+    const projection = d3.geoMercator()
+			.scale(130)
+			.translate( [820 / 2, height / 1.5]);
+
+	const path = d3.geoPath().projection(projection);
+
+    Promise.all([
+        d3.csv('who.csv'),
+        d3.json('world_countries.json'),
+        d3.tsv('world_population.tsv')
+    ]).then(function(data) {
+		const fertilityById = {};
+
+        let who = data[0];
+        let countries = data[1];
+        let population = data[2];
+
+        let fieldColor = 'Total fertility rate (per woman)';
+        let fieldXAxis = "Urban_population_growth";
+        let fieldYAxis = "Urban_population_pct_of_total";
+
+        who.forEach(d => {
+            if(d[fieldColor] === '') {
+                d[fieldColor] = undefined;
+            }
+        });
+
+        population.forEach(d =>
+        {
+            var res = who.find(e =>
+            {
+                return e.Country === d.name;
+            });
+            if(typeof res !== 'undefined') {
+                res.id = d.id;
+            }
+        });
+
+        who.forEach(d => { fertilityById[d.id] = +d[fieldColor]; });
+        countries.features.forEach(d => { d.population = fertilityById[d.id] });
+
+        let choropleth = svg.append('g')
+				.attr('class', 'countries')
+				.selectAll('path')
+				.data(countries.features)
+				.enter().append('path')
+                .attr("class", d => { return "COUNTRY-CODE-"+d.id;} )
+				.attr('d', path)
+				.style('fill', d => color(fertilityById[d.id]))
+				.style('stroke', 'white')
+				.style('opacity', 0.8)
+                .style('stroke-width', 0.3);
+
+		svg.append('path')
+				.datum(topojson.mesh(countries.features, (a, b) => a.id !== b.id))
+				.attr('class', 'names')
+				.attr('d', path);
+
+        // setup x
+        let xValue = function(d) { return d[fieldXAxis];}, // data -> value
+            xScale = d3.scaleLinear().range([0, height-50]), // value -> display
+            xMap = function(d) { return xScale(xValue(d));}, // data -> display
+            xAxis = d3.axisBottom().scale(xScale);
+
+        // setup y
+        let yValue = function(d) { return d[fieldYAxis];}, // data -> value
+            yScale = d3.scaleLinear().range([height-50, 0]), // value -> display
+            yMap = function(d) { return yScale(yValue(d));}, // data -> display
+            yAxis = d3.axisLeft().scale(yScale);
+
+        // don't want dots overlapping axis, so add in buffer to data domain
+        xScale.domain([-2, 8]);
+        yScale.domain([0, 100]);
+
+        // x-axis
+        scatterplot.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (height-50) + ")")
+            .call(xAxis)
+            .append("text")
+            .attr("class", "label")
+            .attr("x", xScale(8))
+            .attr("y", -6)
+            .attr("fill", "black")
+            .style("text-anchor", "end")
+            .text(fieldXAxis.replace(/_/g, " "));
+
+        // y-axis
+        scatterplot.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .append("text")
+            .attr("class", "label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", 0)
+            .attr("y", yScale(100))
+            .attr("fill", "black")
+            .attr("dy", "1.5em")
+            .style("text-anchor", "end")
+            .text(fieldYAxis.replace(/_/g, " "));
+
+        // draw dots
+        let dots = scatterplot.selectAll(".dot")
+            .data(who)
+            .enter().append("circle")
+            .attr("class", d => { return "dot COUNTRY-"+d.Country; } )
+            .attr("r", 3.5)
+            .attr("cx", xMap)
+            .attr("cy", yMap)
+            .style("fill", function(d) { return color(d[fieldColor]);})
+            .style("stroke", "white")
+            .style("stroke-width", "0")
+            .on("mouseover", function(d) {})
+            .on("mouseout", function(d) {});
+
+        // draw legend
+        var legend = scatterplot.append("g").attr("class", "legend-group").selectAll(".legend")
+            .data(color.domain())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { return "translate(-100," + (i+1) * 20 + ")"; });
+
+        // draw legend colored rectangles
+        legend.append("rect")
+            .attr("x", xScale(8) + 100 + 4)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", (d,i)=> color(d-0.0001));
+
+        // draw legend text
+        legend.append("text")
+            .attr("x", xScale(8) + 100)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function(d) { return "< "+d;});
+
+        scatterplot.select("g.legend-group")
+            .append("g")
+            .attr("class", "legend")
+            .attr("transform", "translate(-100,0)")
+            .append("text")
+            .attr("x", xScale(8) + 100 + 20)
+            .attr("y", 0)
+            .attr("dy", "1.5em")
+            .style("text-anchor", "end")
+            .text(fieldColor);
+
+        // ****** Changes ******
+        let radius = 40;
+        let coords = [];
+        let persistent = false;
+        let mouseHidden = true;
+        let countriesList = [];
+
+        // New cursor
+        let cursor = svg
+            .on("mousemove", mouseMove)
+            .on("click", persistentBrush)
+            .append("g");
+
+        // Outer transparent circle
+        let outerCursor = cursor.append("circle")
+            .attr("r", radius)
+            .attr("fill", "#69a3b2")
+            .attr("fill-opacity", "0.3")
+            .attr("stroke", "#2d515b")
+            .attr("visibility", "hidden");
+
+        // Inner opaque circle
+        let innerCursor = cursor.append("circle")
+            .attr("r", 4)
+            .attr("fill", "#2d515b")
+            .on("wheel", resizeBrush)
+            .attr("visibility", "hidden");
+
+        // Persistent transparent circle
+        let persistentCursor = svg.append("circle")
+            .attr("r", radius)
+            .attr("fill", "#69a3b2")
+            .attr("fill-opacity", "0.3")
+            .attr("stroke", "#2d515b")
+            .attr("visibility", "hidden");
+
+        // Disable cursor on plot
+        svg.style('cursor', 'none')
+            .on('mouseenter', mouseOn)
+            .on('mouseleave', mouseOff);
+
+        // Get centroids of all countries Source: https://bl.ocks.org/curran/55d327542393530662c3
+        let centroids = countries.features.map(function (feature){
+            return [feature.id, path.centroid(feature)];
+        });
+
+        function mouseOn() {
+            mouseHidden = false;
+            if (!persistent)
+                outerCursor.attr("visibility", "visible");
+            innerCursor.attr("visibility", "visible");
+        }
+
+        function mouseOff() {
+            mouseHidden = true;
+            if (!persistent)
+                outerCursor.attr("visibility", "hidden");
+            innerCursor.attr("visibility", "hidden");
+        }
+
+        function persistentBrush() {
+            persistent = !persistent;
+
+            if (persistent) {
+                coords = d3.mouse(this);
+                persistentCursor.attr("r", radius)
+                    .attr("cx", coords[0])
+                    .attr("cy", coords[1])
+                    .attr("visibility", "visible");
+                outerCursor.attr("visibility", "hidden");
+            } else {
+                persistentCursor.attr("visibility", "hidden");
+                outerCursor.attr("visibility", "visible");
+            }
+
+        }
+
+        function resizeBrush() {
+            radius = Math.max(5, radius + (d3.event.wheelDeltaY / 40));
+            outerCursor
+                .attr("r", radius);
+
+            if (!persistent) {
+                checkBrushed();
+            }
+        }
+
+        function mouseMove() {
+            if (mouseHidden)
+                mouseOn();
+
+            coords = d3.mouse(this);
+            cursor.attr("transform", "translate(" + coords[0] + "," + coords[1] + ")");
+
+            if (!persistent)
+                checkBrushed(outerCursor);
+        }
+
+        function checkBrushed() {
+            countriesList = [];
+            dots.each(function (d, i) {
+                if (insideCircle(d3.select(this).attr("cx"), d3.select(this).attr("cy"), coords[0] - scatterShiftx, coords[1] - scatterShifty)) {
+                    d3.select(this)
+                        .style('stroke', 'orange')
+                        .style('stroke-width', 3);
+                    countriesList.push(d.id);
+                } else {
+                    d3.select(this)
+                        .style('stroke', 'white')
+                        .style('stroke-width', 0);
+                }
+            });
+            //console.log(countriesList);
+            if (countriesList.length !== 0) {
+                updateMap();
+                return;
+            } else {
+                resetMap();
+            }
+
+            countriesList = [];
+            centroids.forEach(function (d) {
+                if (insideCircle(d[1][0], d[1][1], coords[0], coords[1])) {
+                    countriesList.push(d[0]);
+                    svg.select(".COUNTRY-CODE-"+d[0])
+                        .style('stroke', 'orange')
+                        .style('stroke-width', 3);
+                } else {
+                    svg.select(".COUNTRY-CODE-"+d[0])
+                        .style('stroke', 'white')
+                        .style('stroke-width', 0.3);
+                }
+
+            });
+            //console.log(countriesList);
+            if (countriesList.length !== 0) {
+                updateScatter();
+            } else {
+                resetScatter();
+            }
+        }
+
+        function updateMap() {
+            choropleth.each(function (d, i) {
+                if (countriesList.indexOf(d.id) !== -1)
+                    d3.select(this)
+                        .style('fill', d => color(fertilityById[d.id]))
+                        .style('stroke', 'orange')
+                        .style('stroke-width', 3);
+                else
+                    d3.select(this)
+                        .style('fill', d => greyColor(fertilityById[d.id]))
+                        .style('stroke', 'white')
+                        .style('stroke-width', 0.3);
+            });
+        }
+
+        function resetMap() {
+            choropleth.each(function (d, i) {
+                d3.select(this)
+                    .style('fill', d => color(fertilityById[d.id]))
+                    .style('stroke', 'white')
+                    .style('stroke-width', 0.3);
+            });
+        }
+
+        function updateScatter() {
+            if (countriesList.length !== 0)
+                dots.each(function (d, i) {
+                    if (countriesList.indexOf(d.id) !== -1) {
+                        d3.select(this)
+                            .style('fill', d => color(fertilityById[d.id]))
+                            .style('stroke', 'orange')
+                            .style('stroke-width', 3);
+
+                    } else {
+                        d3.select(this)
+                            .style('fill', d => greyColor(fertilityById[d.id]))
+                            .style('stroke', 'white')
+                            .style('stroke-width', 0);
+                    }
+                });
+        }
+
+        function resetScatter() {
+            dots.each(function (d, i) {
+                d3.select(this)
+                    .style('fill', d => color(fertilityById[d.id]))
+                    .style('stroke', 'white')
+                    .style('stroke-width', 0);
+            });
+        }
+
+        function insideCircle(x1, y1, x2, y2) {
+            return Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) < Math.pow(radius, 2);
+        }
+    });
+
+</script>
+<p>
+    Controls: <br/>
+    Mouse movement -> Move selection <br/>
+    Scroll wheel -> Selection size <br/>
+    Click -> Lock selection <br/>
+</p>
+</body>
