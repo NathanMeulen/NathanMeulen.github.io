@@ -54,6 +54,18 @@ html,body
 
 .portrait {
     width: 25%;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .portrait {
+        position: absolute; 
+        bottom: 0;
+    }
+
+    .bio-div {
+        padding-bottom: 120px;
+    }
 }
 
 .bio {

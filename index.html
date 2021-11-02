@@ -5,8 +5,8 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <meta name="description" content="Nathan Meulenbroek's personal website.">
+  <meta name="author" content="Nathan Meulenbroek">
 
   <title>Nathan Meulenbroek</title>
 
@@ -28,11 +28,11 @@
   <link rel="manifest" href="img/favicon/site.webmanifest">
 
   <!-- Plugins for this template -->
-  <link href="css/agency.min.css" rel="stylesheet">
+  <link href="css/agency.css" rel="stylesheet">
   <link rel="stylesheet" href="css/aos.css" />
 
   <!-- Custom styles for this template -->
-  <link href="css/style.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
 
 </head>
 
@@ -47,7 +47,8 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav text-uppercase ml-auto">
-        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#bio">Who I Am</a></li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#bio">Bio</a></li>
+        <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#research">Research</a></li>
         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#experience">Experience</a></li>
         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#portfolio">Portfolio</a></li>
         <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#photography">Photographs</a></li>
@@ -62,38 +63,62 @@
   <div class="container">
     <div class="intro-text">
       <div class="intro-heading text-uppercase ">Nathan Meulenbroek</div>
-      <div class="intro-lead-in">MSc Program, Biomedical Engineering</div>
+      <div class="intro-lead-in">PhD Student, Biomedical Engineering</div>
     </div>
   </div>
 </header>
 
 <!-- Bio -->
-<section class="page-section" id="bio">
+<section class="bg-light page-section" id="bio">
   <div class="container">
     <div class="row">
-      <div class="col-lg-12 text-center flex-center">
-          <h2 class="section-heading text-uppercase bio" data-aos="fade-right" data-aos-offset="200">Who I Am</h2>
+      <div class="col-lg-12 text-left flex-center bio-div">
+          <h2 class="section-heading text-uppercase bio" style="text-align: center;" data-aos="fade-right">Who I Am</h2>
           <p class="bio" data-aos="fade-right">
-            My name is Nathan Meulenbroek and I'm a graduate student in Biomedical Engineering.
-            My background is in Computer Science and Physics, where my curiosity lead me to explore, learn and try new things.
-            I strive to do this through a graduate program in a new field where I can apply my skills in new ways and
-            I delight in the opportunities along the way to engage with passionate and creative individuals seeking their own paths.
-            My interests include medical technology, computational physics, computer science, photography and speed skating.
+            Hi, my name is Nathan Meulenbroek and I'm a part of the Graduate Program in Biomedical Engineering at the University of Calgary. I have Bachelor’s degrees in computer science and physics, which taught me to explore, solve problems in unique ways, and appreciate interdisciplinary approaches. This motivated me to pursue a highly interdisciplinary graduate program where I can apply my technical knowledge to medical research. I have found value in this approach both in terms of personal growth, as well as the connections that I have created with passionate and creative individuals pursuing similar goals. 
             <br/>
             <br/>
-            I am committed to helping my community in meaningful ways that will leave a positive impact for
-            the next generation. I believe that an important aspect of every action I take is the legacy
-            that I leave behind.
+            I am passionate about giving back to my immediate community through volunteering and leadership with community organizations. My goal is always to contribute in meaningful, lasting, and sustainable ways, enacting organizational change that will continue to leave a positive impact for future generation. 
             <br/>
             <br/>
-            Have a question for me about my work, opportunities or something else?
+            Have a question for me about my work, research or something else?
             <br/>
             <a class="js-scroll-trigger" href="#contact">Send me an email!</a>
           </p>
-        <img class="portrait img-round" data-aos="fade-left" src="img/portrait/square-nathan.jpg">
+        <img class="portrait img-round" data-aos="fade-left"  data-aos-offset="-50" src="img/portrait/square-nathan.jpg">
       </div>
     </div>
   </div>
+</section>
+
+<!-- Research and Publications -->
+<section class="bg-dark page-section" id="research">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-left flex-center">
+        <h2 class="section-heading text-uppercase text-light" data-aos="fade-right">My Research</h2>
+        <p class="text-muted-light" data-aos="fade-right">
+          My graduate research explores medical ultrasound imaging using a new type of ultrasound sensor that is able to provide directivity information about recorded signals. This information has vast and exciting implications for existing reconstruction methods, where we hypothesize that it will increase image quality, decrease computational complexity, and decrease imaging cost. We apply this to two types of ultrasound imaging (passive cavitation imaging and ultrasound computer tomography), seeking to demonstrate the benefits of this new transducer technology.
+          <br/>
+          <br/>
+          My undergraduate research explored signal processing techniques and how to account for the non-linear effects of the skull bone on ultrasound signals. As a part of this research, we showed that after passing through the skull, signals are delayed in a quasi-linear way. Thus, we used multivariable linear regression, a type of machine learning, and showed it to be significantly better at estimating these delays that existing automated techniques. These results were published in IEEE Ultrasonics, Ferroelectrics, and Frequency Control in 2020, at the end of my undergraduate degrees.    
+          <br/>
+          <br/>
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- Publications -->
+  <!-- <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-left flex-center">
+        <h2 class="section-heading text-uppercase text-light" data-aos="fade-right">Publications</h2>
+        <p class="text-muted-light" data-aos="fade-right">
+          IEEE multivariable regression
+        </p>
+      </div>
+    </div>
+  </div> -->
 </section>
 
 <!-- Experience Grid -->
@@ -224,7 +249,7 @@
     <div class="row">
       <div class="col-lg-12 text-center">
         <h2 class="section-heading text-uppercase">Photography</h2>
-        <h3 class="section-subheading text-muted"> In my spare time, I enjoy taking photos. Here's some of my favourites. </h3>
+        <h3 class="section-subheading text-muted"> I also enjoy photography in my free time. Here are some of my favourites. Please reach out if you're interested in reusing any of them </h3>
       </div>
     </div>
 
@@ -233,35 +258,23 @@
       <div id="carousel" class="carousel slide" data-ride="carousel" data-aos="zoom-in">
         <!-- Indicators -->
         <ul class="carousel-indicators">
-          <li data-target="#demo" data-slide-to="0" class="active"></li>
-          <li data-target="#demo" data-slide-to="1"></li>
-          <li data-target="#demo" data-slide-to="2"></li>
+          <li class="active"></li>
+          <li></li>
+          <li></li>
         </ul>
 
         <!-- The slideshow -->
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img src="img/photographs/wild-rose.jpg" alt="Los Angeles" class="carousel-image">
-            <div class="carousel-caption">
-              <h3>Alberta Wild Rose</h3>
-              <p>Banff, AB</p>
-            </div>
+            <img src="img/photographs/wild-rose.jpg" alt="Alberta Wild Rose" class="carousel-image">
           </div>
 
           <div class="carousel-item">
-            <img src="img/photographs/fresh-snow-caps.jpg" alt="Chicago" class="carousel-image">
-            <div class="carousel-caption">
-              <h3>Fresh Snow Caps</h3>
-              <p>Banff, AB</p>
-            </div>
+            <img src="img/photographs/fresh-snow-caps.jpg" alt="Banff, AB" class="carousel-image">
           </div>
 
           <div class="carousel-item">
-            <img src="img/photographs/rundle-mountain.jpg" alt="New York" class="carousel-image">
-            <div class="carousel-caption">
-              <h3>Rundle Mountain</h3>
-              <p>Banff, AB</p>
-            </div>
+            <img src="img/photographs/rundle-mountain.jpg" alt="Banff, AB" class="carousel-image">
           </div>
         </div>
 

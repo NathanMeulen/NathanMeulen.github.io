@@ -206,10 +206,10 @@ header.masthead .intro-text .intro-heading {
 
 @media (min-width: 768px) {
   header.mainpage-masthead {
-    height: 100vh;
+    height: 60vh;
   }
   header.masthead .intro-text {
-    padding-top: 300px;
+    padding-top: 15vw;
     padding-bottom: 200px;
   }
   header.masthead .intro-text .intro-lead-in {
